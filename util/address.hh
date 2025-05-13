@@ -35,6 +35,7 @@ public:
   Address( const std::string& hostname, const std::string& service );
 
   //! Construct from dotted-quad string ("18.243.0.1") and numeric port.
+  // 显式构造函数，防止隐式转换，必须显式创建Address对象
   explicit Address( const std::string& ip, std::uint16_t port = 0 );
 
   //! Construct from a [sockaddr *](@ref man7::socket).
