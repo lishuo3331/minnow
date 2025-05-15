@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"path": "../baseline_CS144"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.py": "python",
+			"span": "cpp",
+			"string_view": "cpp",
+			"format": "cpp",
+			"iomanip": "cpp",
+			"ranges": "cpp",
+			"sstream": "cpp",
+			"concepts": "cpp"
+		}
+	}
+}
