@@ -3,6 +3,7 @@
 #include "reassembler.hh"
 #include "tcp_receiver_message.hh"
 #include "tcp_sender_message.hh"
+#include <queue>
 
 class TCPReceiver
 {
@@ -27,4 +28,6 @@ public:
 
 private:
   Reassembler reassembler_;
+  // 记录随机序列号起始值
+  std::optional<Wrap32> zero_point_ {};
 };

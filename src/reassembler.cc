@@ -29,6 +29,7 @@ auto Reassembler::split( uint64_t pos ) noexcept
 void Reassembler::insert( uint64_t first_index, string data, bool is_last_substring )
 {
   const auto try_colse = [&]() noexcept -> void {
+    debug( "try_colse() first_index:{}, is_last_substring", first_index, is_last_substring );
     if ( end_index_.has_value() and end_index_.value() == writer().bytes_pushed() ) {
       output_.writer().close();
       return;
@@ -108,6 +109,6 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
 // This function is for testing only; don't add extra state to support it.
 uint64_t Reassembler::count_bytes_pending() const
 {
-  debug( "unimplemented count_bytes_pending() called" );
+  debug( "count_bytes_pending() called total_pending_bytes_ : {}", total_pending_bytes_ );
   return total_pending_bytes_;
 }
