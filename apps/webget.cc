@@ -1,4 +1,5 @@
-#include "socket.hh"
+#include "tcp_minnow_socket.hh"
+// #include "socket.hh"
 
 #include <cstdlib>
 #include <iostream>
@@ -13,7 +14,8 @@ void get_URL( const string& host, const string& path )
   // 协议为http协议
   Address addr( host, "http" );
   // 创建TCP套接字
-  TCPSocket tcp_socket;
+  CS144TCPSocket tcp_socket;
+  // TCPSocket tcp_socket;
   // 连接到指定地址
   tcp_socket.connect( addr );
   // 构建HTTP请求并发送
@@ -30,6 +32,7 @@ void get_URL( const string& host, const string& path )
   }
   // 关闭TCP套接字
   tcp_socket.close();
+  tcp_socket.wait_until_closed();
 }
 
 int main( int argc, char* argv[] )

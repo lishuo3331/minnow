@@ -55,6 +55,7 @@ int main()
     }
 
     // credit for test: Jared Wasserman (2020)
+    // 不能简单判断ack的seqno和已发送未确认数据包的seqno，还需要判断ack的seqno是否超过了当前isn_，如果超过了当前isn_，则为无效ack
     {
       TCPConfig cfg;
       const Wrap32 isn( rd() );

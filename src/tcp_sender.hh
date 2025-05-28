@@ -11,7 +11,7 @@ class TCPSender
 public:
   /* Construct TCP sender with given default Retransmission Timeout and possible ISN */
   TCPSender( ByteStream&& input, Wrap32 isn, uint64_t initial_RTO_ms )
-    : input_( std::move( input ) ), isn_( isn ), initial_RTO_ms_( initial_RTO_ms )
+    : input_( std::move( input ) ), isn_( isn ), initial_RTO_ms_( initial_RTO_ms ), RTO_ms_( initial_RTO_ms_ )
   {}
 
   /* Generate an empty TCPSenderMessage */
@@ -42,4 +42,24 @@ private:
   ByteStream input_;
   Wrap32 isn_;
   uint64_t initial_RTO_ms_;
+
+  // 是否发送了SYN
+  bool syn_ { false };
+  // 是否发送了FIN
+  bool fin_ { false };
+
+  // 向量存储发送的报文
+  std::vector<TCPSenderMessage> msg_vector_ {};
+  // 记录飞行中字节数 即已发送未确认的字节数
+  uint64_t bytes_in_flight_ { 0 };
+  // 记录此时的窗口大小
+  //  可修改为初始窗口大小，待发送窗口大小为初始窗口大小-飞行中字节数，则重传报文不占据发送窗口
+  //  只有接收方window_size_为0时记录为1，当发送方填满发送窗口时，发送方window_size_为0
+  //  初始要记录为1，不然SYN无法发送
+  uint16_t window_size_ = 1;
+  // 连续重传的次数
+  uint64_t consecutive_retransmissions_ { 0 };
+  // 时间定时器
+  uint64_t timer_ { 0 };
+  uint64_t RTO_ms_ = 0;
 };

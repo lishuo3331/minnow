@@ -79,7 +79,7 @@ int main()
       test.execute( Close {} );
       test.execute( ExpectMessage {}.with_fin( true ).with_seqno( isn + 1 ) );
       test.execute( ExpectSeqnosInFlight { 1 } );
-      test.execute( AckReceived { Wrap32 { isn + 2 } } );
+      test.execute( AckReceived { Wrap32 { isn + 2 } } ); // FIN重发 并且序列号还会增长 设置标志位 不要重发FIN
       test.execute( ExpectSeqno { isn + 2 } );
       test.execute( ExpectSeqnosInFlight { 0 } );
       test.execute( ExpectNoSegment {} );

@@ -94,7 +94,9 @@ int main()
       test.execute( Push { "1234567" } );
       test.execute( Close {} );
       test.execute( ExpectMessage {}.with_no_flags().with_data( "1234567" ) );
-      test.execute( ExpectNoSegment {} ); // window is full
+      test.execute(
+        ExpectNoSegment {} ); // window is full FIN需要在msg_vector中没数据 缓存中数据全部发送完毕后再附加
+                              // 并且FIN要占据序列号 input中有数据则需要先发送 如果没有数据
       test.execute( AckReceived { Wrap32 { isn + 8 } }.with_win( 1 ) );
       test.execute( ExpectMessage {}.with_fin( true ).with_data( "" ) );
       test.execute( ExpectNoSegment {} );
