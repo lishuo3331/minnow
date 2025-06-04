@@ -71,7 +71,13 @@
 			"streambuf": "cpp",
 			"thread": "cpp",
 			"typeinfo": "cpp",
-			"variant": "cpp"
+			"variant": "cpp",
+			"cassert": "cpp",
+			"cerrno": "cpp",
+			"climits": "cpp",
+			"ios": "cpp",
+			"locale": "cpp",
+			"queue": "cpp"
 		}
 	}
 }

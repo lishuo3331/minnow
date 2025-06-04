@@ -325,7 +325,11 @@ int main()
       const EthernetAddress local_eth = random_private_ethernet_address();
       const EthernetAddress target_eth1 = random_private_ethernet_address();
       const EthernetAddress target_eth2 = random_private_ethernet_address();
-
+      // 排队等待发送的数据包不应该存在对头阻塞现象 如果有对应的arp表项就应该发送
+      // 那不能使用queue存储，这样时间复杂度为o(n)
+      // 同时需要关联 nexthop和EthernetFrame，还需要考虑nexthop会重复的情况，所以使用multimap来存储
+      // 改用multimap来存储后 时间复杂度为o(lg(n))，收到arp后清理缓存包数量暂时无问题，
+      // 但是
       NetworkInterfaceTestHarness test {
         "pending datagrams sent to correct dst when ARP replies received out-of-order",
         local_eth,
@@ -516,7 +520,8 @@ int main()
         ExpectFrame { make_frame( local_eth, target_eth, EthernetHeader::TYPE_IPv4, serialize( datagram ) ) } );
       test.execute( ExpectNoFrame {} );
     }
-
+    // 两个IP数据报的目的地址相同，到达间隔时间超过5S，因此会重复发送ARP请求
+    // 如果ARP请求超时，对应的IP数据报应该被丢弃
     // test credit: Josselin Somerville Roberts
     {
       const EthernetAddress local_eth = random_private_ethernet_address();

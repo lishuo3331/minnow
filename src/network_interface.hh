@@ -6,6 +6,8 @@
 
 #include <memory>
 #include <queue>
+#include <unordered_map>
+#include <map>
 
 // A "network interface" that connects IP (the internet layer, or network layer)
 // with Ethernet (the network access layer, or link layer).
@@ -73,6 +75,10 @@ private:
   // The physical output port (+ a helper function `transmit` that uses it to send an Ethernet frame)
   std::shared_ptr<OutputPort> port_;
   void transmit( const EthernetFrame& frame ) const { port_->transmit( *this, frame ); }
+  // 需要传入optype 目的mac 目的IP
+  auto make_arp(const uint16_t opcode, const EthernetAddress& dst_mac, const uint32_t dst_i) const noexcept -> ARPMessage;
+
+  
 
   // Ethernet (known as hardware, network-access-layer, or link-layer) address of the interface
   EthernetAddress ethernet_address_;
@@ -82,4 +88,28 @@ private:
 
   // Datagrams that have been received
   std::queue<InternetDatagram> datagrams_received_ {};
+
+  std::queue<uint32_t> queue_nexthop_datagrams_ {};
+
+  std::queue<InternetDatagram> queue_datagrams_send_{};
+
+  std::multimap<uint32_t, std::pair<InternetDatagram, size_t>> multimap_datagrams_send_ {};
+
+  std::unordered_map<uint32_t, size_t> arp_send_time {};
+  // 存储IP-ARP映射 用于记载有没有 还需要记录时间 如果在map中记录，每次更新的时间是o(n)，如果使用vector记录，则更新的时间复杂度为o(n)
+  // 因此这样存储，unordered_map存储IP:MAC,时间映射
+  std::unordered_map<uint32_t, std::pair<EthernetAddress, size_t>> ip_arp_map_ {};
+  // map 存储时间，IP地址
+  // 增加：o(lg(n))
+  // 删除：o(1)
+  // 更新：o(1)
+  // 查询：o(1)
+  // 插入需要排序
+  std::map<size_t, uint32_t> time_ip_map_ {};
+  // 时间戳 以0为初始值
+  size_t timestamp_ {0};
+  // ARP表项超时时间
+  #define ARP_TIMEOUT 30000
+  // ARP请求超时时间
+  #define ARP_REQ_TIMEOUT 5000
 };
