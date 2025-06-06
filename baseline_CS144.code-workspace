@@ -77,7 +77,8 @@
 			"climits": "cpp",
 			"ios": "cpp",
 			"locale": "cpp",
-			"queue": "cpp"
+			"queue": "cpp",
+			"bitset": "cpp"
 		}
 	}
 }

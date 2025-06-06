@@ -2,6 +2,7 @@
 
 #include "address.hh"
 #include "ethernet_frame.hh"
+#include "arp_message.hh"
 #include "ipv4_datagram.hh"
 
 #include <memory>

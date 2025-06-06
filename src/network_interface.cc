@@ -38,7 +38,7 @@ NetworkInterface::NetworkInterface(string_view name,
 //! can be converted to a uint32_t (raw 32-bit IP address) by using the Address::ipv4_numeric() method.
 void NetworkInterface::send_datagram(const InternetDatagram &dgram, const Address &next_hop)
 {
-  debug("send_datagram called");
+  // debug("send_datagram called");
   EthernetFrame stEthernetFrame{};
 
   // 源mac
@@ -88,11 +88,11 @@ void NetworkInterface::send_datagram(const InternetDatagram &dgram, const Addres
 void NetworkInterface::recv_frame(EthernetFrame frame)
 {
   // 打印帧头string
-  debug("recv_frame called, line : {}, frame header: {}", __LINE__, frame.header.to_string());
+  // debug("recv_frame called, line : {}, frame header: {}", __LINE__, frame.header.to_string());
   // 目的地址非广播地址 并且 目的地址非本机MAC
   if (frame.header.dst != ETHERNET_BROADCAST and ethernet_address_ != frame.header.dst)
   {
-    debug("recv_frame called, line : {}, ethernet packet dst address is not valid", __LINE__);
+    // debug("recv_frame called, line : {}, ethernet packet dst address is not valid", __LINE__);
     return;
   }
   // 判断帧类型
@@ -177,7 +177,7 @@ void NetworkInterface::recv_frame(EthernetFrame frame)
 //! \param[in] ms_since_last_tick the number of milliseconds since the last call to this method
 void NetworkInterface::tick(const size_t ms_since_last_tick)
 {
-  debug("tick({}) called", ms_since_last_tick);
+  // debug("tick({}) called", ms_since_last_tick);
   timestamp_ += ms_since_last_tick;
   // 遍历time_ip_map_ 找到过期的映射关系 删除
   for (auto it = time_ip_map_.begin(); it != time_ip_map_.end();)
