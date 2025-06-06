@@ -22,7 +22,6 @@ void Router::add_route(const uint32_t route_prefix,
        << " on interface " << interface_num << "\n";
   // 首先查询IP是否在路由表中，如果在，更新数据
   // 否则，插入数据
-  debug("add_route() called");
   // 目的网段可能会配置子网网址，所以需要与上子网掩码的前prefix_length位进行匹配
   uint32_t mask = (prefix_length == 0) ? 0 : 0xffffffff << (32 - prefix_length);
   
@@ -68,6 +67,7 @@ void Router::route()
       auto &datagrames_queue = interface_it->get()->datagrams_received();
       while (!datagrames_queue.empty())
       {
+        // 放在收包循环内部，避免污染下一个数据包的转发
         std::optional<Address> next_hop{};
         size_t interface_index{};
         uint8_t prefix_length{};
@@ -93,7 +93,9 @@ void Router::route()
             // 当前子网掩码是否大于prefix_length 如果不大于 则不进行匹配
             // 如果next_hop没有value 则数据报的next_hop则为数据报的目的地址
             // 如果有value 则数据报的next_hop则为表项的next_hop
-            if (std::get<0>(route_table_it->second) > prefix_length)
+            // Error: Host default_router did NOT receive an expected Internet datagram: IPv4 len=32 proto=144 ttl=63 src=10.0.0.2 dst=1.2.3.4
+            // 调试记录2 子网掩码初始值为0，默认路由子网掩码为0，因此将>修改为>=
+            if (std::get<0>(route_table_it->second) >= prefix_length)
             {
               if (std::get<1>(route_table_it->second).has_value())
               {
@@ -109,10 +111,6 @@ void Router::route()
               // 接口下标
               interface_index = std::get<2>(route_table_it->second);
             }
-            else
-            {
-              debug("The current subnet mask is not greater than prefix_length");
-            }
           }
         }
         // 从接口发包
@@ -120,9 +118,6 @@ void Router::route()
         // 判断获取了下一跳地址
         if (next_hop.has_value())
         {
-          debug("route called, line : {}, packet header : {}", __LINE__, packet.header.to_string());
-          // 打印interface_index的相关信息
-          debug("route called, line : {}, prefix_length : {}, interface index : {}, interface name : {}, next_htop : {}", __LINE__, prefix_length, interface_index, interface(interface_index)->name(), next_hop->ip());
           // TTL值-1
           packet.header.ttl--;
           // 重新计算数据报校验和
